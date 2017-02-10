@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package shrty;
+
+service Shrty {
+  rpc Shorten(ShortenRequest) returns (ShortenResponse) {}
+  rpc Expand(ExpandRequest) returns (ExpandResponse) {}
+}
+
+message ShortenRequest {
+  string URL = 1;
+}
+
+message ShortenResponse {
+  string ShrtURL = 1;
+  string Token = 2;
+}
+
+message ExpandRequest {
+  string Token = 1;
+}
+
+message ExpandResponse {
+  string URL = 1;
+}
+
+message ShortenedURL {
+  int64 ID = 1;
+  string OrigURL = 2;
+  string ShrtURL = 3;
+  string Token = 4;
+  int64 CreatedTime = 5;
+  int64 Views = 6;
+}
