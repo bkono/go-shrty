@@ -4,6 +4,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/grpclog"
 )
 
 // ShrtygRPCServer implements the gRPC ShrtyService.
@@ -18,6 +19,7 @@ func NewgRPCServer(s ShortenedURLService) *ShrtygRPCServer {
 
 // Shorten creates a ShortUrl for a given ShortenRequest.
 func (ss *ShrtygRPCServer) Shorten(ctx context.Context, sr *ShortenRequest) (*ShortenResponse, error) {
+	grpclog.Printf("attempting to shorten %v", sr)
 	su, err := ss.s.Shorten(sr.URL)
 	if err != nil {
 		return nil, grpc.Errorf(codes.Internal, "Error while building the shrt url")
@@ -29,7 +31,9 @@ func (ss *ShrtygRPCServer) Shorten(ctx context.Context, sr *ShortenRequest) (*Sh
 
 // Expand expands a token into its original url.
 func (ss *ShrtygRPCServer) Expand(ctx context.Context, er *ExpandRequest) (*ExpandResponse, error) {
+	grpclog.Printf("attempting to expand %v", er)
 	u, err := ss.s.Expand(er.Token)
+	grpclog.Printf("result %v, %v", u, err)
 	if err == ErrTokenNotFound {
 		return nil, grpc.Errorf(codes.NotFound, "Token not found")
 	} else if err != nil {

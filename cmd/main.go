@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 
-	"git.kono.sh/shrty"
+	"git.kono.sh/bkono/shrty"
 )
 
 var (
