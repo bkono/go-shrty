@@ -32,7 +32,6 @@ var expandCmd = &cobra.Command{
 	servers metrics.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("serverAddr = %+v\n", serverAddr)
-		// TODO: Work your own magic here
 		if len(args) == 0 {
 			fmt.Println("token required")
 			return

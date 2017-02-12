@@ -4,12 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net"
 	"net/http"
 	"strings"
-
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/grpclog"
 
 	"git.kono.sh/bkono/shrty"
 )
@@ -41,21 +37,13 @@ func main() {
 	// Setup ShortenedURLService
 	s := shrty.NewShortenedURLService(*base, db, ts)
 
-	shrtygRPC := shrty.NewgRPCServer(s)
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *grpcPort))
-	if err != nil {
-		grpclog.Fatalf("failed to listen: %v", err)
-	}
-
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		expandHandler(w, r, s)
 	})
 	go http.ListenAndServe(fmt.Sprintf(":%d", *httpPort), nil)
 
 	fmt.Println("past ListenAndServe")
-	grpcServer := grpc.NewServer()
-	shrty.RegisterShrtyServer(grpcServer, shrtygRPC)
-	grpcServer.Serve(lis)
+	shrty.RunGRPCServer(s, *grpcPort)
 }
 
 func expandHandler(w http.ResponseWriter, r *http.Request, s shrty.ShortenedURLService) {
