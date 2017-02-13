@@ -1,68 +1,21 @@
+// Copyright © 2017 Bryan Konowitz <bryan@kono.sh>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package main
 
-import (
-	"flag"
-	"fmt"
-	"log"
-	"net/http"
-	"strings"
-
-	"git.kono.sh/bkono/shrty"
-)
-
-var (
-	base     = flag.String("baseURL", "http://localhost:3000/", "The base URL when shortening")
-	httpPort = flag.Int("httpPort", 3000, "The HTTP server port")
-	grpcPort = flag.Int("grpcPort", 3001, "The gRPC server port")
-)
+import "git.kono.sh/bkono/shrty/cmd/shrtycli"
 
 func main() {
-	flag.Parse()
-
-	fmt.Printf("base = %+v\n", *base)
-
-	// Setup db
-	db := shrty.NewDBClient()
-	db.Path = "shrty.db"
-	err := db.Open()
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	// Setup TokenService
-	var ts shrty.TokenService
-	ts = shrty.NewTokenService("some secret salt")
-
-	// Setup ShortenedURLService
-	s := shrty.NewShortenedURLService(*base, db, ts)
-
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		expandHandler(w, r, s)
-	})
-	go http.ListenAndServe(fmt.Sprintf(":%d", *httpPort), nil)
-
-	fmt.Println("past ListenAndServe")
-	shrty.RunGRPCServer(s, *grpcPort)
+	shrtycli.Execute()
 }
-
-func expandHandler(w http.ResponseWriter, r *http.Request, s shrty.ShortenedURLService) {
-	tk := strings.TrimLeft(r.URL.Path, "/")
-	url, err := s.Expand(tk)
-	if err != nil {
-		log.Printf("Error while expanding token = %+v\n", tk)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	log.Printf("redirecting token %v to %v", tk, url)
-	http.Redirect(w, r, url, http.StatusFound)
-}
-
-// TODOs:
-// - take flags for the url base
-// - cache urls, don't recreate them
-// - grpc endpoint for create and expand
-// - web endpoint for metrics
-// - move metrics to async task
-// - swap to chi, for the fun of it
