@@ -24,10 +24,11 @@ I'm going to iterate a bit. Pending tasks will be maintained in this readme.
 - [x] Increment views counting per URL
 - [x] Add cli flag for baseURL (flag parsing, gotta see what the stdlib offers)
 - [x] Proto integ for serialized structs
+- [X] gRPC endpoint for both create and expand
+- [X] gRPC client binary for launchbar integration
+- [X] Integrate cobra for cli cleanliness
 - [ ] Migrate to something along the lines of [Standard Project Layout](https://medium.com/@benbjohnson/standard-package-layout-7cdbc8391fc1#.w26wk0yon)
 - [ ] Don't recreate already known URLs
-- [ ] gRPC endpoint for both create and expand
-- [ ] gRPC client binary for launchbar integration
 - [ ] JSON endpoint for fetching metrics
 - [ ] Web views for metrics
 - [ ] Swap to chi for routing. Do this one to see if chi is the right fit for other projects
